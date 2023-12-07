@@ -25,11 +25,15 @@ jobs:
       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
         images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
+        flavor: |
+          latest=false
+          prefix=
+          suffix=${{ matrix.classifier }}
     - name: Build and push Docker image
       uses: docker/build-push-action@v5.1.0
       with:
         context: .
         file: ./${{ matrix.classifier }}.dockerfile
         push: true
-        tags: ${{ steps.meta.outputs.tags }}-${{ matrix.classifier }}
+        tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
