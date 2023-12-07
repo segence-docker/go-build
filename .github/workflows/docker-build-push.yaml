@@ -25,16 +25,17 @@ jobs:
       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
         images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
-        tags: |
-          type=semver,pattern={{major}}.{{minor}}.{{patch}}
-        flavor: |
-          latest=false
-          prefix=
-          suffix=-${{ matrix.classifier }}
+    - name: Set Versions
+      uses: actions/github-script@v7
+      id: set_version
+      with:
+        script: |
+          const tag_no_plus = context.ref.replace('+', '')
+          core.setOutput('tag_no_plus', tag_no_plus)
     - name: Build and push Docker image
       uses: docker/build-push-action@v5.1.0
       with:
         context: ./${{ matrix.classifier }}
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: ${{steps.set_version.outputs.tag_no_plus}}-${{ matrix.classifier }}
         labels: ${{ steps.meta.outputs.labels }}
