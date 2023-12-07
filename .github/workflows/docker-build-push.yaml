@@ -20,22 +20,18 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-      with:
-        images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
     - name: Set Versions
       uses: actions/github-script@v7
       id: set_version
       with:
         script: |
-          const tag_no_plus = context.ref.replace('+', '')
-          core.setOutput('tag_no_plus', tag_no_plus)
+          const tag = context.ref.substring(10)
+          const tag_semver_docker_compatible = tag.replace('v', '').replace('+', '-')
+          core.setOutput('tag_semver_docker_compatible', tag_semver_docker_compatible)
     - name: Build and push Docker image
       uses: docker/build-push-action@v5.1.0
       with:
         context: ./${{ matrix.classifier }}
         push: true
-        tags: ${{steps.set_version.outputs.tag_no_plus}}-${{ matrix.classifier }}
+        tags: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{steps.set_version.outputs.tag_semver_docker_compatible}}-${{ matrix.classifier }}
         labels: ${{ steps.meta.outputs.labels }}
