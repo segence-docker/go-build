@@ -1,10 +1,9 @@
-FROM golang:1.21.1-alpine AS builder
+FROM golang:1.23.1-alpine AS builder
 
 ENV PATH="/go/bin:${PATH}"
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
 ENV GOOS=linux
-ENV GOARCH=amd64
 
 RUN apk -U add ca-certificates
 RUN apk update && apk upgrade && apk add pkgconf git bash build-base sudo
