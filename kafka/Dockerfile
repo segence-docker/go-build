@@ -1,5 +1,7 @@
 FROM golang:1.24.4-alpine3.22 AS builder
 
+ARG LIBRDKAFKA_VERSION=v2.10.1
+
 ENV PATH="/go/bin:${PATH}"
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
@@ -12,7 +14,7 @@ RUN apk update && \
     rm -rf /var/cache/apk/*
 
 
-RUN git clone https://github.com/confluentinc/librdkafka /tmp/librdkafka
+RUN git clone --depth 1 --branch ${LIBRDKAFKA_VERSION} https://github.com/confluentinc/librdkafka /tmp/librdkafka
 
 WORKDIR /tmp/librdkafka
 RUN ./configure --prefix /usr && make && make install
